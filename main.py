@@ -1,36 +1,8 @@
-
 import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import timm
-import numpy as np
-import matplotlib.pyplot as plt
-from tqdm import tqdm
-from torch_optimizer import RAdam  # Специальная библиотека для RAdam
-from utils import get_data_loaders, calculate_metrics, plot_training_history
 
-# Определение устройства (GPU/CPU)
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(f"Используется устройство: {device}")
-
-# Параметры обучения
-BATCH_SIZE = 32
-NUM_EPOCHS = 15
-LEARNING_RATE = 0.001
-DATA_DIR = "data/stanford_dogs"  # Путь к распакованному датасету
-MODEL_SAVE_DIR = "models"
-RESULTS_DIR = "results"
-
-# Создание директорий
-os.makedirs(MODEL_SAVE_DIR, exist_ok=True)
-os.makedirs(RESULTS_DIR, exist_ok=True)
-
-import os
-import torch
-import torch.nn as nn
-import torch.optim as optim
-import timm
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
@@ -40,16 +12,22 @@ from utils import get_data_loaders, calculate_metrics, plot_training_history
 # Отключаем предупреждение о символических ссылках
 os.environ['HF_HUB_DISABLE_SYMLINKS_WARNING'] = '1'
 
-# Определение устройства (GPU/CPU)
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(f"Используется устройство: {device}")
+# Проверка доступности GPU
+if not torch.cuda.is_available():
+    raise RuntimeError("GPU недоступен. Для выполнения этого кода требуется CUDA-совместимое устройство.")
 
-# Если используется CPU, уменьшаем размер батча для ускорения
-BATCH_SIZE = 32 if device.type == 'cuda' else 16
+# Определение устройства (только GPU)
+device = torch.device("cuda")
+print(f"Используется устройство: {device}")
+print(f"GPU: {torch.cuda.get_device_name(0)}")
+print(f"Память GPU: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.2f} GB")
+
+# Размер батча для GPU
+BATCH_SIZE = 32
 print(f"Размер батча: {BATCH_SIZE}")
 
 # Параметры обучения
-NUM_EPOCHS = 5
+NUM_EPOCHS = 1
 LEARNING_RATE = 0.001
 DATA_DIR = "data/stanford_dogs"  # Путь к распакованному датасету
 MODEL_SAVE_DIR = "models"
